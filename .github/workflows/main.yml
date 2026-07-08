@@ -1,4 +1,4 @@
-name: Build Electron App
+name: Build Electron App (Docker)
 
 on:
   push:
@@ -6,23 +6,19 @@ on:
 
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 18
-          check-latest: true
-
-      - name: Install dependencies
-        run: npm install
-
-      - name: Build app
-        run: npm run dist
+      - name: Build inside Docker (Node.js 20)
+        run: |
+          docker run --rm \
+            -v ${{ github.workspace }}:/app \
+            -w /app \
+            node:20 \
+            bash -c "npm install && npm run dist"
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
